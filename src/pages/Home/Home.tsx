@@ -1,28 +1,58 @@
 import { Link } from 'react-router-dom'
+import { useForm, Controller } from 'react-hook-form'
+import {
+  TextField,
+  Button,
+  MenuItem,
+} from '@mui/material'
+import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import dayjs from 'dayjs'
+import * as yup from 'yup'
+import { yupResolver } from '@hookform/resolvers/yup'
+import './Home.css'
 import { Employee } from '../../type/Type'
 
+const eighteenYearsAgo = new Date();
+eighteenYearsAgo.setFullYear(eighteenYearsAgo.getFullYear() - 18)
+
+const employeeSchema = yup.object().shape({
+  firstName: yup.string().required('First Name is required'),
+  lastName: yup.string().required('Last Name is required'),
+  dateOfBirth: yup.date()
+    .nullable()
+    .required('Date of Birth is required')
+    .transform((value) => (value instanceof Date || value === null ? value : value.toDate()))
+    .max(eighteenYearsAgo, 'All employees must be at least 18 years old'),
+  startDate: yup
+    .date()
+    .typeError('Invalid date')
+    .required('Start Date is required'),
+  street: yup.string().required('Street is required'),
+  city: yup.string().required('City is required'),
+  state: yup.string().required('State is required'),
+  zipCode: yup
+    .number()
+    .typeError('Zip Code must be a number')
+    .required('Zip Code is required'),
+  department: yup.string().required('Department is required'),
+})
+
 function Home() {
-  function saveEmployee(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    const employees: Employee[] = JSON.parse(
-      localStorage.getItem('employees') || '[]'
-    )
+  const {
+    control,
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<Employee>({
+    resolver: yupResolver(employeeSchema),
+  })
 
-    const form = new FormData(e.target as HTMLFormElement)
+  const onSubmit = (data: Employee) => {
+    const employees: Employee[] = JSON.parse(localStorage.getItem('employees') || '[]');
+    employees.push(data);
+    localStorage.setItem('employees', JSON.stringify(employees));
 
-    const employee: Employee = {
-      firstName: form.get('first-name') as string,
-      lastName: form.get('last-name') as string,
-      dateOfBirth: form.get('date-of-birth') as string,
-      startDate: form.get('start-date') as string,
-      department: form.get('department') as string,
-      street: form.get('street') as string,
-      city: form.get('city') as string,
-      state: form.get('state') as string,
-      zipCode: form.get('zip-code') as string,
-    }
-    employees.push(employee)
-    localStorage.setItem('employees', JSON.stringify(employees))
     alert('Mettre modale de validation')
   }
 
@@ -34,45 +64,128 @@ function Home() {
       <div className="container">
         <Link to="/employee-list">View Current Employees</Link>
         <h2>Create Employee</h2>
-        <form id="create-employee" onSubmit={saveEmployee}>
-          <label htmlFor="first-name">First Name</label>
-          <input type="text" id="first-name" />
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <form id="create-employee" className="form-container" onSubmit={handleSubmit(onSubmit)}>
+            <TextField
+              label="First Name"
+              {...register('firstName')}
+              error={!!errors.firstName}
+              helperText={errors.firstName?.message}
+              fullWidth
+            />
 
-          <label htmlFor="last-name">Last Name</label>
-          <input type="text" id="last-name" />
+            <TextField
+              label="Last Name"
+              {...register('lastName')}
+              error={!!errors.lastName}
+              helperText={errors.lastName?.message}
+              fullWidth
+            />
 
-          <label htmlFor="date-of-birth">Date of Birth</label>
-          <input id="date-of-birth" type="date" />
+            <Controller
+              name="dateOfBirth"
+              control={control}
+              render={({ field }) => (
+                <DatePicker
+                  label="Date of Birth"
+                  value={field.value ? dayjs(field.value) : null}
+                  onChange={(date) =>
+                    field.onChange(date ? dayjs(date).toISOString() : null)
+                  }
+                  slotProps={{
+                    textField: {
+                      error: !!errors.dateOfBirth,
+                      helperText: errors.dateOfBirth?.message,
+                    },
+                  }}
+                />
+              )}
+            />
 
-          <label htmlFor="start-date">Start Date</label>
-          <input id="start-date" type="date" />
+            <Controller
+              name="startDate"
+              control={control}
+              render={({ field }) => (
+                <DatePicker
+                  label="Start Date"
+                  value={field.value ? dayjs(field.value) : null}
+                  onChange={(date) =>
+                    field.onChange(date ? dayjs(date).toISOString() : null)
+                  }
+                  slotProps={{
+                    textField: {
+                      error: !!errors.startDate,
+                      helperText: errors.startDate?.message,
+                    },
+                  }}
+                />
+              )}
+            />
 
-          <fieldset className="address">
-            <legend>Address</legend>
+            <fieldset className="form-container">
+              <legend>Address</legend>
 
-            <label htmlFor="street">Street</label>
-            <input id="street" type="text" />
+              <TextField
+                label="Street"
+                {...register('street')}
+                error={!!errors.street}
+                helperText={errors.street?.message}
+                fullWidth
+              />
 
-            <label htmlFor="city">City</label>
-            <input id="city" type="text" />
+              <TextField
+                label="City"
+                {...register('city')}
+                error={!!errors.city}
+                helperText={errors.city?.message}
+                fullWidth
+              />
 
-            <label htmlFor="state">State</label>
-            <select name="state" id="state"></select>
+              <TextField
+                select
+                label="State"
+                {...register('state')}
+                error={!!errors.state}
+                helperText={errors.state?.message}
+                fullWidth
+              >
+                <MenuItem value="">Select a state</MenuItem>
+                <MenuItem value="NY">New York</MenuItem>
+                <MenuItem value="CA">California</MenuItem>
+                <MenuItem value="TX">Texas</MenuItem>
+              </TextField>
 
-            <label htmlFor="zip-code">Zip Code</label>
-            <input id="zip-code" type="number" />
-          </fieldset>
+              <TextField
+                label="Zip Code"
+                type="number"
+                {...register('zipCode')}
+                error={!!errors.zipCode}
+                helperText={errors.zipCode?.message}
+                fullWidth
+              />
+            </fieldset>
 
-          <label htmlFor="department">Department</label>
-          <select name="department" id="department">
-            <option>Sales</option>
-            <option>Marketing</option>
-            <option>Engineering</option>
-            <option>Human Resources</option>
-            <option>Legal</option>
-          </select>
-          <button type="submit">Save</button>
-        </form>
+            <TextField
+              select
+              label="Department"
+              {...register('department')}
+              error={!!errors.department}
+              helperText={errors.department?.message}
+              fullWidth
+            >
+              <MenuItem value="">Select a department</MenuItem>
+              <MenuItem value="Sales">Sales</MenuItem>
+              <MenuItem value="Marketing">Marketing</MenuItem>
+              <MenuItem value="Engineering">Engineering</MenuItem>
+              <MenuItem value="Human Resources">Human Resources</MenuItem>
+              <MenuItem value="Legal">Legal</MenuItem>
+            </TextField>
+
+            <Button type="submit" variant="contained" color="primary">
+              Save
+            </Button>
+          </form>
+        </LocalizationProvider>
       </div>
       <div id="confirmation" className="modal">
         Employee Created!
