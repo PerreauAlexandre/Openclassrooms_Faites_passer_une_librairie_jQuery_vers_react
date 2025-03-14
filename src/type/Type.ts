@@ -9,3 +9,8 @@ export type Employee = {
   state: string
   zipCode: number
 }
+
+export type StateType = {
+  name: string,
+  abbreviation: string
+}

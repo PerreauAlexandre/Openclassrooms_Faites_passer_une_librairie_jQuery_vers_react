@@ -1,28 +1,28 @@
 import { Link } from 'react-router-dom'
 import { useForm, Controller } from 'react-hook-form'
-import {
-  TextField,
-  Button,
-  MenuItem,
-} from '@mui/material'
+import { TextField, Button, MenuItem } from '@mui/material'
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs from 'dayjs'
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
 import './Home.css'
-import { Employee } from '../../type/Type'
+import { Employee, StateType } from '../../type/Type'
+import { states } from '../../data/States.ts'
 
-const eighteenYearsAgo = new Date();
+const eighteenYearsAgo = new Date()
 eighteenYearsAgo.setFullYear(eighteenYearsAgo.getFullYear() - 18)
 
 const employeeSchema = yup.object().shape({
   firstName: yup.string().required('First Name is required'),
   lastName: yup.string().required('Last Name is required'),
-  dateOfBirth: yup.date()
+  dateOfBirth: yup
+    .date()
     .nullable()
     .required('Date of Birth is required')
-    .transform((value) => (value instanceof Date || value === null ? value : value.toDate()))
+    .transform((value) =>
+      value instanceof Date || value === null ? value : value.toDate()
+    )
     .max(eighteenYearsAgo, 'All employees must be at least 18 years old'),
   startDate: yup
     .date()
@@ -49,9 +49,11 @@ function Home() {
   })
 
   const onSubmit = (data: Employee) => {
-    const employees: Employee[] = JSON.parse(localStorage.getItem('employees') || '[]');
-    employees.push(data);
-    localStorage.setItem('employees', JSON.stringify(employees));
+    const employees: Employee[] = JSON.parse(
+      localStorage.getItem('employees') || '[]'
+    )
+    employees.push(data)
+    localStorage.setItem('employees', JSON.stringify(employees))
 
     alert('Mettre modale de validation')
   }
@@ -65,7 +67,11 @@ function Home() {
         <Link to="/employee-list">View Current Employees</Link>
         <h2>Create Employee</h2>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <form id="create-employee" className="form-container" onSubmit={handleSubmit(onSubmit)}>
+          <form
+            id="create-employee"
+            className="form-container"
+            onSubmit={handleSubmit(onSubmit)}
+          >
             <TextField
               label="First Name"
               {...register('firstName')}
@@ -73,7 +79,6 @@ function Home() {
               helperText={errors.firstName?.message}
               fullWidth
             />
-
             <TextField
               label="Last Name"
               {...register('lastName')}
@@ -81,7 +86,6 @@ function Home() {
               helperText={errors.lastName?.message}
               fullWidth
             />
-
             <Controller
               name="dateOfBirth"
               control={control}
@@ -101,7 +105,6 @@ function Home() {
                 />
               )}
             />
-
             <Controller
               name="startDate"
               control={control}
@@ -124,7 +127,6 @@ function Home() {
 
             <fieldset className="form-container">
               <legend>Address</legend>
-
               <TextField
                 label="Street"
                 {...register('street')}
@@ -132,7 +134,6 @@ function Home() {
                 helperText={errors.street?.message}
                 fullWidth
               />
-
               <TextField
                 label="City"
                 {...register('city')}
@@ -140,21 +141,22 @@ function Home() {
                 helperText={errors.city?.message}
                 fullWidth
               />
-
               <TextField
                 select
                 label="State"
+                defaultValue=""
                 {...register('state')}
                 error={!!errors.state}
                 helperText={errors.state?.message}
                 fullWidth
               >
                 <MenuItem value="">Select a state</MenuItem>
-                <MenuItem value="NY">New York</MenuItem>
-                <MenuItem value="CA">California</MenuItem>
-                <MenuItem value="TX">Texas</MenuItem>
+                {states.map((state: StateType) => (
+                  <MenuItem key={state.abbreviation} value={state.abbreviation}>
+                    {state.name}
+                  </MenuItem>
+                ))}
               </TextField>
-
               <TextField
                 label="Zip Code"
                 type="number"
@@ -164,10 +166,10 @@ function Home() {
                 fullWidth
               />
             </fieldset>
-
             <TextField
               select
               label="Department"
+              defaultValue=""
               {...register('department')}
               error={!!errors.department}
               helperText={errors.department?.message}
@@ -180,7 +182,6 @@ function Home() {
               <MenuItem value="Human Resources">Human Resources</MenuItem>
               <MenuItem value="Legal">Legal</MenuItem>
             </TextField>
-
             <Button type="submit" variant="contained" color="primary">
               Save
             </Button>
