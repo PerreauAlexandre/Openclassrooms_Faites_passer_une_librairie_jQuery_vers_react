@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useForm, Controller } from 'react-hook-form'
 import { TextField, Button, MenuItem } from '@mui/material'
@@ -9,6 +10,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import './Home.css'
 import { Employee, StateType } from '../../type/Type'
 import { states } from '../../data/States.ts'
+import Modal from 'modale_alexandre_perreau_p14_openclassrooms'
 
 const eighteenYearsAgo = new Date()
 eighteenYearsAgo.setFullYear(eighteenYearsAgo.getFullYear() - 18)
@@ -39,6 +41,11 @@ const employeeSchema = yup.object().shape({
 })
 
 function Home() {
+  const [modalOpen, setModalOpen] = useState(false)
+
+  const openModal = () => setModalOpen(true)
+  const closeModal = () => setModalOpen(false)
+
   const {
     control,
     register,
@@ -55,7 +62,7 @@ function Home() {
     employees.push(data)
     localStorage.setItem('employees', JSON.stringify(employees))
 
-    alert('Mettre modale de validation')
+    openModal()
   }
 
   return (
@@ -188,9 +195,11 @@ function Home() {
           </form>
         </LocalizationProvider>
       </div>
-      <div id="confirmation" className="modal">
-        Employee Created!
-      </div>
+      <Modal
+        content="Employee Created!"
+        isOpen={modalOpen}
+        closeModal={closeModal}
+      />
     </main>
   )
 }

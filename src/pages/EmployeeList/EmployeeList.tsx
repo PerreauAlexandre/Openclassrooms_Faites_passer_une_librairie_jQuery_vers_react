@@ -53,7 +53,7 @@ function EmployeeList() {
         <h1>Current Employees</h1>
         <Box
           sx={{
-            width: "90%",
+            width: '90%',
             height: 400,
           }}
         >
