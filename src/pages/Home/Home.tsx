@@ -11,6 +11,7 @@ import './Home.css'
 import { Employee, StateType } from '../../type/Type'
 import { states } from '../../data/States.ts'
 import Modal from 'modale_alexandre_perreau_p14_openclassrooms'
+import 'modale_alexandre_perreau_p14_openclassrooms/dist/index.css'
 
 const eighteenYearsAgo = new Date()
 eighteenYearsAgo.setFullYear(eighteenYearsAgo.getFullYear() - 18)
