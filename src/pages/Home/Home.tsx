@@ -10,8 +10,8 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import './Home.css'
 import { Employee, StateType } from '../../type/Type'
 import { states } from '../../data/States.ts'
-import Modal from 'modale_alexandre_perreau_p14_openclassrooms'
-import 'modale_alexandre_perreau_p14_openclassrooms/dist/index.css'
+import Modal from 'openclassrooms_p14_modale_alexandre_perreau'
+import 'openclassrooms_p14_modale_alexandre_perreau/dist/openclassrooms_p14_modale_alexandre_perreau.css'
 
 const eighteenYearsAgo = new Date()
 eighteenYearsAgo.setFullYear(eighteenYearsAgo.getFullYear() - 18)

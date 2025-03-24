@@ -1,0 +1,1 @@
+declare module 'openclassrooms_p14_modale_alexandre_perreau';

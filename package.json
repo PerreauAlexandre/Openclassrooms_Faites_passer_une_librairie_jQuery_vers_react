@@ -18,7 +18,7 @@
     "@mui/x-date-pickers": "^7.27.3",
     "dayjs": "^1.11.13",
     "latest": "^0.2.0",
-    "modale_alexandre_perreau_p14_openclassrooms": "^1.0.10",
+    "openclassrooms_p14_modale_alexandre_perreau": "^1.0.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.54.2",
