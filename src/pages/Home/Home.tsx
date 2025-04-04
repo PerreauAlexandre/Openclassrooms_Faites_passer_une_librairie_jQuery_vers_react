@@ -50,10 +50,22 @@ function Home() {
   const {
     control,
     register,
+    reset,
     handleSubmit,
     formState: { errors },
   } = useForm<Employee>({
     resolver: yupResolver(employeeSchema),
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      dateOfBirth: undefined,
+      startDate: undefined,
+      street: '',
+      city: '',
+      state: '',
+      zipCode: undefined,
+      department: '',
+    },
   })
 
   const onSubmit = (data: Employee) => {
@@ -64,6 +76,7 @@ function Home() {
     localStorage.setItem('employees', JSON.stringify(employees))
 
     openModal()
+    reset()
   }
 
   return (
@@ -149,22 +162,31 @@ function Home() {
                 helperText={errors.city?.message}
                 fullWidth
               />
-              <TextField
-                select
-                label="State"
-                defaultValue=""
-                {...register('state')}
-                error={!!errors.state}
-                helperText={errors.state?.message}
-                fullWidth
-              >
-                <MenuItem value="">Select a state</MenuItem>
-                {states.map((state: StateType) => (
-                  <MenuItem key={state.abbreviation} value={state.abbreviation}>
-                    {state.name}
-                  </MenuItem>
-                ))}
-              </TextField>
+              <Controller
+                name="state"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    select
+                    label="State"
+                    {...field}
+                    {...register('state')}
+                    error={!!errors.state}
+                    helperText={errors.state?.message}
+                    fullWidth
+                  >
+                    <MenuItem value="">Select a state</MenuItem>
+                    {states.map((state: StateType) => (
+                      <MenuItem
+                        key={state.abbreviation}
+                        value={state.abbreviation}
+                      >
+                        {state.name}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                )}
+              />
               <TextField
                 label="Zip Code"
                 type="number"
@@ -174,22 +196,28 @@ function Home() {
                 fullWidth
               />
             </fieldset>
-            <TextField
-              select
-              label="Department"
-              defaultValue=""
-              {...register('department')}
-              error={!!errors.department}
-              helperText={errors.department?.message}
-              fullWidth
-            >
-              <MenuItem value="">Select a department</MenuItem>
-              <MenuItem value="Sales">Sales</MenuItem>
-              <MenuItem value="Marketing">Marketing</MenuItem>
-              <MenuItem value="Engineering">Engineering</MenuItem>
-              <MenuItem value="Human Resources">Human Resources</MenuItem>
-              <MenuItem value="Legal">Legal</MenuItem>
-            </TextField>
+            <Controller
+              name="department"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  select
+                  label="Department"
+                  {...field}
+                  {...register('department')}
+                  error={!!errors.department}
+                  helperText={errors.department?.message}
+                  fullWidth
+                >
+                  <MenuItem value="">Select a department</MenuItem>
+                  <MenuItem value="Sales">Sales</MenuItem>
+                  <MenuItem value="Marketing">Marketing</MenuItem>
+                  <MenuItem value="Engineering">Engineering</MenuItem>
+                  <MenuItem value="Human Resources">Human Resources</MenuItem>
+                  <MenuItem value="Legal">Legal</MenuItem>
+                </TextField>
+              )}
+            />
             <Button type="submit" variant="contained" color="primary">
               Save
             </Button>
